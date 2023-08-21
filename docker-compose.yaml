@@ -6,3 +6,10 @@ services:
     build: .
     ports:
       - "8000:8000"
+
+nginx:
+  image: nginx:1.18.0 (Ubuntu)
+  depends_on:
+    - django
+  ports:
+    - "80:80"
