@@ -36,7 +36,7 @@ class Favorite(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f'{self.user} added {self.product} to favorites'
+        return str(self.user)
 
     class Meta:
         unique_together = ('user', 'product')

@@ -12,12 +12,3 @@ services:
     volumes:
       - .:/app
     command: [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
-
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - .default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - django

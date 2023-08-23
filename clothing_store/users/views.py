@@ -1,38 +1,37 @@
-from django.shortcuts import render
 from django.contrib.auth import authenticate
 from django.db.utils import IntegrityError
 
-from rest_framework import viewsets, mixins, generics
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.views import APIView
+from rest_framework import status
 
+from users.models import Favorite
+from users.permissions import IsOwnerOrAdmin
+from users.mixins import FavoriteMixins, UserDetailMixins
 from users.serializers import (
     UserSerializer, LoginSerializer, FavoriteSerializer
 )
-from users.models import Favorite, User
-from users.permissions import IsOwnerOrAdmin
 
 
-class UserDetailView(RetrieveUpdateDestroyAPIView):
+class UserDetailView(UserDetailMixins):
     """
     Класс для отображения и изменения информации о текущем пользователе
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsOwnerOrAdmin]
     serializer_class = UserSerializer
 
     def get_object(self):
         return self.request.user
 
 
-class RegisterViewSet(viewsets.ViewSet):
+class RegisterAPIView(APIView):
     """
     Класс для регистрации пользователя
     """
     serializer_class = UserSerializer
 
-    def create(self, request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -40,14 +39,14 @@ class RegisterViewSet(viewsets.ViewSet):
         return Response(serializer.errors)
 
 
-class LoginViewSet(viewsets.ViewSet):
+class LoginAPIView(APIView):
     """
     Класс для аутентификации пользователя,
     после успешной аутентификации генериуется токен
     """
     serializer_class = LoginSerializer
 
-    def create(self, request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         if not serializer.is_valid():
@@ -65,21 +64,17 @@ class LoginViewSet(viewsets.ViewSet):
         return Response({'token': token.key})
 
 
-class FavoriteViewSet(mixins.ListModelMixin,
-                      mixins.RetrieveModelMixin,
-                      mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
+class FavoriteView(FavoriteMixins):
     """
     Класс для отображения избранных товаров, 
     пользователь может только добавлять, удалять и 
     детально просмотривать избранные товары
     """
     serializer_class = FavoriteSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsOwnerOrAdmin]
 
     def get_queryset(self):
-        user = self.request.user
-        return Favorite.objects.filter(user=user)
+        return Favorite.objects.filter(user=self.request.user)
 
     def create(self, request):
         user = request.user
@@ -90,3 +85,4 @@ class FavoriteViewSet(mixins.ListModelMixin,
                 serializer.save()
             except IntegrityError:
                 return Response({'error': 'Этот товар уже добавлен в избранное'})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

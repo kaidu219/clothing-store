@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@52k8%ude!gve52x1_4&(+_*0ao@2sx@rlj7)pg8_p%@*hvuag
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     # install apps
     'rest_framework',
+    'django_filters',
     'rest_framework.authtoken',
     'drf_yasg',
 
@@ -62,7 +63,10 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
 }
 ROOT_URLCONF = 'clothing_store.urls'
 
