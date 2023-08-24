@@ -6,9 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     expose:
-      - "8000"
+      - "8001:8000"
     environment:
       DEBUG: "True"
     volumes:
-      - .:/app
-    command: [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
+      - .:/clothing_store

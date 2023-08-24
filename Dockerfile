@@ -14,5 +14,5 @@ COPY . /clothing_store
 
 EXPOSE 8000
 
-CMD ["python", "/clothing_store/clothing_store/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "/clothing_store/clothing_store/manage.py", "runserver"]
 
